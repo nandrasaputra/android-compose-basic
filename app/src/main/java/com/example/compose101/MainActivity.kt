@@ -32,36 +32,39 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Compose101Theme {
-                Scaffold {
-                    Column {
-                        var text by remember { mutableStateOf("") }
-                        val focusManager = LocalFocusManager.current
-                        CatSearchBar(
-                            text,
-                            onTextChange = {
-                                text = it
-                            },
-                            onDeleteClick = {
-                                focusManager.clearFocus()
-                                text = ""
-                            },
-                        )
-                        Divider(
-                            Modifier
-                                .height(1.dp)
-                                .fillMaxWidth()
-                        )
-                        CatsView(
-                            catModelList = cats,
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            filter = text
-                        )
-                    }
-                }
+                CatsScreen()
             }
         }
+    }
+}
+
+@Composable
+fun CatsScreen() {
+    Column {
+        var text by remember { mutableStateOf("") }
+        val focusManager = LocalFocusManager.current
+        CatSearchBar(
+            text,
+            onTextChange = {
+                text = it
+            },
+            onDeleteClick = {
+                focusManager.clearFocus()
+                text = ""
+            },
+        )
+        Divider(
+            Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+        )
+        CatsView(
+            catModelList = cats,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            filter = text
+        )
     }
 }
 
@@ -136,13 +139,17 @@ fun CatsView(modifier: Modifier = Modifier, filter: String = "", catModelList: L
     } else {
         Column(modifier = modifier) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "No Cats Found", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Text(
+                text = "No Cats Found",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
 
 @Preview(
-    showSystemUi = true
+    showSystemUi = false
 )
 @Composable
 fun PreviewCatsView() {
@@ -207,6 +214,105 @@ fun PreviewCatCard() {
             R.drawable.cat_cireng
         )
     )
+}
+
+@Composable
+fun CatCard2(catModel: CatModel, padding: PaddingValues = PaddingValues()) {
+    Surface(
+        color = Color(0xFFADD8D6),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .aspectRatio(2.5f)
+            .padding(padding)
+    ) {
+        Row {
+            Image(
+                painter = painterResource(id = catModel.catPictureResourceResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f, true)
+                    .padding(16.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Divider(
+                modifier = Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .padding(vertical = 8.dp)
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Cat Name: ${catModel.catName}",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "Cat Age: ${catModel.catAge}",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+/*@Preview
+@Composable
+fun PreviewCatCard2() {
+    CatCard2(
+        catModel = CatModel(
+            "Putham",
+            "7 Month",
+            R.drawable.cat_cireng
+        )
+    )
+}*/
+
+@Composable
+fun CatSearchBar2(
+    text: String = "",
+    onTextChange: (String) -> Unit,
+    onDeleteClick: () -> Unit = {}
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            value = text,
+            onValueChange = onTextChange,
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(16.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                disabledTextColor = Color.Transparent,
+                backgroundColor = Color(0xFFD1D1D1),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            placeholder = { Text("Search cat by name") }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Image(
+            ImageVector.vectorResource(id = R.drawable.ic_delete),
+            null,
+            colorFilter = ColorFilter.tint(Color.Red.copy(alpha = 0.5f)),
+            modifier = Modifier
+                .size(40.dp)
+                .clickable {
+                    onDeleteClick()
+                }
+        )
+    }
 }
 
 data class CatModel(
